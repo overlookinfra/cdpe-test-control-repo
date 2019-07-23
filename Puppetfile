@@ -11,4 +11,5 @@ mod 'cd4pe',
   :ref => 'master'
 mod 'cd4pe_tests',
   :git => 'https://github.com/puppetlabs/puppetlabs-cd4pe_tests.git',
-  :ref => 'staging_change'
+  :default_branch => :control_branch
+#  :ref => 'staging_change'
