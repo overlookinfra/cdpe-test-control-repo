@@ -40,7 +40,6 @@ node default {
   # This is where you can declare classes for all nodes.
   # Example:
   #   class { 'my_class': }
-  class { 'cd4pe_tests': }
   notify { "Hello world!": message => "I am in the ${environment} environment"}
   notify { "server_facts = ${server_facts}": }
 
