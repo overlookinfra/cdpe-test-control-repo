@@ -3,27 +3,7 @@ config:
   enable_pull_requests_from_forks: true
   deployment_policy_branch: production
 pipelines:
-  /feature_.*/:
-    triggers:
-      - pull_request
-      - commit
-    stages:
-      - name: "Lint/Parser validation"
-        auto_promote: all_succeeded
-        steps:
-          - type: job
-            name: control-repo-puppetfile-syntax-validate
-          - type: job
-            name: control-repo-template-syntax-validate
-      - name: "Deploy feature environment"
-        steps:
-          - type: deployment
-            pe_server: Test_PE_Credentials
-            policy: feature_branch
-            target:
-              type: node_group
-              node_group_id: 123-guid-123
-  master:
+  main:
     triggers:
       - pull_request
       - commit
@@ -42,35 +22,20 @@ pipelines:
             concurrent_compilations: 10
             all_deployments: false #takes precedence over 'deployments'
             deployments:
-              - "Direct merge to Production"
-              - "my custom deploy 1"
+              - "Deployment to module-ia-tests on pe-kearney-gitlab-instance"
           - type: pull_request_gate
       - name: "Deploy to lower UAT"
         auto_promote: false
         steps:
-          - type: deployment
-            policy: direct_merge
-            name: "Direct merge to Production"
-            pe_server: Test_PE_Credentials
-            target:
-              type: node_group
-              node_group_id: 123-guid-123
-              environment_prefix: gitlab_
-            parameters:
-              node_group: "Production Environment"
-              noop: false
-              pql: 'Node { catalog_environment == "production" }'
-              timeout: 60
-              stop_if_nodes_fail: 10
-          - type: deployment
-            name: "my custom deploy 1"
+          - type: DEPLOYMENT
+            name: Deployment to module-ia-tests on pe-kearney-gitlab-instance
             policy:
-              source: control-repo
-              name: deployments::custom_policy1
-            pe_server: Test_PE_Credentials
+              name: 'cd4pe_deployments::eventual_consistency'
+            parameters: {}
+            timeout: 3600000
+            concurrent_compilations: 0
+            all_deployments: false
+            pe_server: pe-kearney-gitlab-instance
             target:
-              type: node_group
-              node_group_id: 123-guid-123
-            parameters:
-              custom_param1: custom_value
-              custom_param2: custom_value
+              type: NODE_GROUP
+              node_group_id: 34641790-e066-4e1e-b1b1-008c18b7213c
