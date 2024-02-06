@@ -1,41 +1,29 @@
-spec_version: v1
 config:
-  enable_pull_requests_from_forks: true
-  deployment_policy_branch: production
+  enable_pull_requests_from_forks: false
+  deployment_policy_branch: "production"
+  enable_pe_plans: true
 pipelines:
   main:
     triggers:
-      - pull_request
-      - commit
+    - "COMMIT"
     stages:
-      - name: "Lint/Parser validation"
-        auto_promote: all_succeeded
-        steps:
-          - type: job
-            name: control-repo-puppetfile-syntax-validate
-          - type: job
-            name: control-repo-template-syntax-validate
-      - name: "Impact Analysis"
-        auto_promote: any_succeeded
-        steps:
-          - type: impact_analysis
-            concurrent_compilations: 10
-            all_deployments: false #takes precedence over 'deployments'
-            deployments:
-              - "Deployment to module-ia-tests on pe-kearney-gitlab-instance"
-          - type: pull_request_gate
-      - name: "Deploy to lower UAT"
-        auto_promote: false
-        steps:
-          - type: DEPLOYMENT
-            name: Deployment to module-ia-tests on pe-kearney-gitlab-instance
-            policy:
-              name: 'cd4pe_deployments::eventual_consistency'
-            parameters: {}
-            timeout: 3600000
-            concurrent_compilations: 0
-            all_deployments: false
-            pe_server: pe-kearney-gitlab-instance
-            target:
-              type: NODE_GROUP
-              node_group_id: 34641790-e066-4e1e-b1b1-008c18b7213c
+    - name: "Code Validation stage"
+      steps:
+      - type: "JOB"
+        name: "control-repo-manifest-validate"
+        concurrent_compilations: 0
+        all_deployments: false
+      - type: "JOB"
+        name: "control-repo-hiera-syntax-validate"
+        concurrent_compilations: 0
+        all_deployments: false
+      - type: "JOB"
+        name: "control-repo-template-syntax-validate"
+        concurrent_compilations: 0
+        all_deployments: false
+      - type: "JOB"
+        name: "control-repo-puppetfile-syntax-validate"
+        concurrent_compilations: 0
+        all_deployments: false
+      auto_promote: "all_succeeded"
+spec_version: "V1"
